@@ -1,0 +1,10 @@
+ {
+  "tabs": [
+    {
+      "name": "Docs",
+      "uri": "http://localhost",
+      "type": "browser",
+      "active": true
+    }
+  ]
+  }
