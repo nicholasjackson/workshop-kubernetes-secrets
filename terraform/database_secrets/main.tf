@@ -20,3 +20,7 @@ provider "vault" {
   address = "http://vault.container.local.jmpd.in:8200"
   token   = "root"
 }
+
+variable "minecraft_image" {
+  default = "insecure.container.local.jmpd.in:5003/minecraft:v0.2.0"
+}

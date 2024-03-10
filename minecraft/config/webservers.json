@@ -1,0 +1,10 @@
+{
+  "-873_92_46": {
+    "port": "8082",
+    "path": "/",
+    "method": "GET",
+    "timeout": "20000",
+    "tlsCert": "",
+    "tlsKey": ""
+  }
+}

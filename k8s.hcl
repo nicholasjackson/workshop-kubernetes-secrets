@@ -36,3 +36,31 @@ resource "terraform" "vault_controller" {
     destination = "/root/.kube/config"
   }
 }
+
+resource "ingress" "microservice_http" {
+  port = 8081
+
+  target {
+    resource = resource.k8s_cluster.dev
+    port     = 8082
+
+    config = {
+      service   = "service"
+      namespace = "default"
+    }
+  }
+}
+
+resource "ingress" "minecraft" {
+  port = 25565
+
+  target {
+    resource = resource.k8s_cluster.dev
+    port     = 25565
+
+    config = {
+      service   = "minecraft"
+      namespace = "default"
+    }
+  }
+}
