@@ -1,0 +1,50 @@
+# Configuring the Database Secrets Engine
+
+Now that the provider has been configured let's create a database secret engine
+in Vault that can generate usernames and passwords for our application to use.
+
+The resource looks like the following example, you configure the connection criteria
+for the database and the roles that can be used to generate credentials.
+
+If you take a close look at the `connection_url` you will see that it uses the
+`{{username}}` and `{{password}}` placeholders. These placeholders are used to
+inject the credentials into the connection string when the credentials are generated.
+
+You may wonder why you would want to use these placeholders. The reason is that
+Vault has a capability to rotate the password used to configure a database
+secrets mount
+
+You may wonder why you would want to use these placeholders. The reason is that
+Vault has a capability to rotate the password used to configure a database
+secrets mount. Using this capability you can provide a username and password
+once and not need to worry about it leaking or being compromised as Vault will
+rotate the password for you. The rotated password is not returned to the user
+it is stored securly in Vault and used to generate the credentials.
+
+
+```hcl
+resource "vault_database_secrets_mount" "minecraft" {
+  path = "database/minecraft"
+
+  postgresql {
+    name              = "minecraft"
+    username          = "{{postgres_user}}"
+    password          = "{{postgres_password}}"
+    connection_url    = "postgresql://\{{username}}:\{{password}}@{{postgres_addr}}/{{postgres_database}}"
+    verify_connection = true
+    allowed_roles = [
+      "reader",
+      "writer",
+      "importer"
+    ]
+  }
+}
+```
+
+<Task id="add_secrets_mount">
+Add the `vault_database_secrets_mount` to your `main.tf` file in the folder 
+`database_secrets`.
+</Task>
+
+Next, let's look at how roles can be created to define different levels of
+permission for the database.

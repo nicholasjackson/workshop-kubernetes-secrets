@@ -1,0 +1,76 @@
+# Vault Terraform Provider
+
+In this section you will learn how to manage database secrets for your application
+using Vault.
+
+You will use Terraform to configure the Vault secrets engine for your database
+and see how you can use this to create and manage database credentials.
+
+The details for the Vault server are below, you will need these to complete the
+exercises in this section.
+
+```plaintext
+url: https://{{ vault_addr }}
+token: {{ vault_token }}
+```
+
+## Using the Terraform provider for Vault
+Let's configure the Vault secrets engine for your database using Terraform.
+
+First you need to add the terraform provider for Vault to your configuration.
+
+The full documentation for the Vault provider can be found at the following
+location.
+
+```
+https://registry.terraform.io/providers/hashicorp/vault/latest/docs
+```
+
+Let's first add a provider block to the Terraform configuration. This block
+specifies the version of the provider to use. The version is important as it
+ensures that the configuration is compatible with the provider.
+
+Add the following to your `main.tf` file in the folder `database_secrets`.
+
+```hcl
+terraform {
+  required_providers {
+    vault = {
+      source = "hashicorp/vault"
+      version = "3.25.0"
+    }
+  }
+}
+```
+
+Once this is added, you can run `terraform init` to download the provider.
+
+<Task id="install_provider">
+  Add the `vault` <a href='javascript:window.parent.window.postMessage({"uri": "https://registry.terraform.io/providers/hashicorp/vault/latest", "name": "Vault Provider", "function": "openHtml", "target": "_blank"}, "*")'>provider</a> 
+  to the current Terraform configuration and initialize the workspace.
+</Task>
+
+### Configuring the Vault Terraform provider
+
+The Vault Terraform provider needs to authenticate to the Vault server. This can
+be configured using the providers block in the Terraform configuration.
+There are a number of ways to authenticate to Vault, for this workshop you will
+use the most basic method, using a token.
+
+Add the following to your `main.tf` file in the folder `database_secrets`.
+
+To configure the Vault server.
+
+```hcl
+provider "vault" {
+  address = "http://vault.container.local.jmpd.in:8200"
+  token   = "root"
+}
+```
+
+<Task id="configure_provider">
+Add the provider block to the current Terraform configuration.
+</Task>
+
+Now that the provider has been configured, let's add the Terraform resources
+that can be used to manage the database secrets.

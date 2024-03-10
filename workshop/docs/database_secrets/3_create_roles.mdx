@@ -1,0 +1,102 @@
+# Creating Database Roles
+
+A database secret backend role allows you to configure the permissions
+that your application will have when connecting to the database. This is
+acheived by defining the SQL statements that will be executed when a new
+set of credentials is requested.
+
+Let's take a look at a very permissive role that could be used for importing
+data into the database.
+
+```hcl
+resource "vault_database_secret_backend_role" "importer" {
+  name    = "importer"
+  backend = vault_database_secrets_mount.minecraft.path
+  db_name = vault_database_secrets_mount.minecraft.postgresql[0].name
+  creation_statements = [
+    "CREATE ROLE \"\{{name}}\" WITH LOGIN PASSWORD '\{{password}}' VALID UNTIL '\{{expiration}}';",
+    "GRANT postgres TO \"\{{name}}\";"
+  ]
+
+  default_ttl = "100"
+  max_ttl     = "100"
+}
+```
+
+This role will create a user and grant the same permission as the `postgres` role to the
+generated user. Because this is a very permissive role, it should only be used for importing
+and not for regular application use.  The `default_ttl` and `max_ttl` are set to 100 seconds
+this helps with the security of the system by ensuring that the credentials are not valid for
+longer than necessary.
+
+Let's add this role to the terraform configuration and give it a try.
+
+Once you have added the role to the configuration, you can apply the configuration 
+to configure vault. sdfsdfsdf
+
+```shell
+cd /workshop/database_secrets
+terraform apply
+```
+
+
+<Task id="add_import_role">
+  Add the `importer` role to the Terraform configuration and apply the configuration.
+</Task>
+
+Now the role has been created, let's see how we can use it, by creating a new set of credentials.
+Let's do this manually using the Vault CLI, execute the following command in the terminal.
+
+## Generating credentials
+
+```shell
+vault read database/minecraft/creds/importer
+```
+
+You should see some output like the following that conains the username and
+password that Vault has generated for you.
+
+```shell
+Key                Value
+---                -----
+lease_id           database/minecraft/creds/importer/lpUuiAZLLAQ5eGX9Rhr6uTua
+lease_duration     1m40s
+lease_renewable    true
+password           mf8IvyPz-hMhaOEHUs2Z
+username           v-token-importer-58KVHdxZMVg80wOw0Wsb-1709914063
+```
+
+## Connecting to the database
+
+Let's now use this username and password to connect to the database. Run the
+following command in the terminal substituting the username with the credentials
+returned by Vault. When prompted for a password, use the password returned by Vault.
+
+```shell
+psql -h {{postgres_addr}} -U <username> -d minecraft
+```
+
+You should now be connected to the database, you can check the contents of the `blocks` table
+by running the following command.
+
+```shell
+select * from blocks;
+```
+
+You will see output that looks like the following.
+
+```shell
+psql (15.6 (Debian 15.6-0+deb12u1), server 15.4 (Debian 15.4-1.pgdg120+1))
+Type "help" for help.
+
+minecraft=> select * from blocks;
+ id |        name         
+----+---------------------
+  1 | Dirt
+  2 | Grass Block
+```
+
+In this section you have learned how to create roles in Vault and how you can
+obtain credentials for your application to connect to the database. In the next
+section you can put this into practice and create two more roles for your 
+application.

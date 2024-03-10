@@ -1,0 +1,119 @@
+# Creating Database Roles  - Continued
+
+In the last section you created a permissive role that could be used for importing 
+data into the database. In this section you will create a more restrictive role 
+that could be used for regular application use.
+
+In this section you will create two more roles a `reader` and a `writer` role.
+
+First Let's create the `reader` role. This role will only have permission to 
+read from the `blocks` table.
+
+## Creating the reader role
+
+Create a new `vault_database_secret_backend_role` resource called `reader` in 
+the `main.tf` file that only has `SELECT` permissions. Remember the  `creation_statements` 
+attribute can use templated vaules for `name`, `password` and `expiration`. 
+
+In addition to this make sure that you set the `default_ttl` and `max_ttl` to `86400`or
+24 hours. 100 seconds is not long enough for a regular application role.
+
+### Hint:
+Your creations statements will look like the following:
+
+```hcl
+"CREATE ROLE \"{{name}}\" WITH LOGIN PASSWORD '{{password}}' VALID UNTIL '{{expiration}}';",
+"GRANT SELECT ON counter TO \"{{name}}\";",
+```
+
+<Task id="add_reader_role">
+  Add the `reader` role to the Terraform configuration and apply the configuration.
+</Task>
+
+<p>
+<details>
+  <summary style=\{{ fontSize: '18px', color: 'rgb(84, 128, 178)', fontWeight: 'medium' }} >Solution: reader role</summary>
+
+```hcl
+resource "vault_database_secret_backend_role" "reader" {
+  name    = "reader"
+  backend = vault_database_secrets_mount.minecraft.path
+  db_name = vault_database_secrets_mount.minecraft.postgresql[0].name
+  creation_statements = [
+    "CREATE ROLE \"\{{name}}\" WITH LOGIN PASSWORD '\{{password}}' VALID UNTIL '\{{expiration}}';",
+    "GRANT SELECT ON blocks TO \"\{{name}}\";",
+  ]
+
+  default_ttl = "86400"
+  max_ttl     = "86400"
+}
+```
+
+</details>
+</p>
+
+## Creating the writer role
+
+In addition to a reader role you can also create a writer role. This role will have
+`SELECT`, `INSERT`, `UPDATE` and `DELETE` permissions on the `blocks` table. 
+
+Have a go at creating the `writer` role in the `main.tf` file.
+
+<Task id="add_writer_role">
+  Add the `writer` role to the Terraform configuration and apply the configuration.
+</Task>
+
+<p>
+<details>
+  <summary style=\{{ fontSize: '18px', color: 'rgb(84, 128, 178)', fontWeight: 'medium' }} >Solution: writer role</summary>
+
+```hcl
+resource "vault_database_secret_backend_role" "writer" {
+  name    = "writer"
+  backend = vault_database_secrets_mount.minecraft.path
+  db_name = vault_database_secrets_mount.minecraft.postgresql[0].name
+  creation_statements = [
+    "CREATE ROLE \"\{{name}}\" WITH LOGIN PASSWORD '\{{password}}' VALID UNTIL '\{{expiration}}';",
+    "GRANT SELECT ON blocks TO \"\{{name}}\";",
+    "GRANT INSERT ON blocks TO \"\{{name}}\";",
+    "GRANT UPDATE ON blocks TO \"\{{name}}\";",
+    "GRANT DELETE ON blocks TO \"\{{name}}\";",
+  ]
+  
+  default_ttl = "86400"
+  max_ttl     = "86400"
+}
+```
+
+</details>
+</p>
+
+Once you have added both of the roles to the configuration, you can apply the configuration
+using the following commands:
+
+```shell
+terraform apply
+```
+
+If you are curious, why not try generating some credentials for the `reader` role, and 
+then try to use them to do an update on the `blocks` table.
+
+```shell
+vault read database/minecraft/creds/reader
+```
+
+```shell
+psql -h {{postgres_addr}} \
+  -U <user> \
+  -d {{postgres_database}} \
+  -c "UPDATE blocks SET type = 'stone' WHERE id = 1;"
+```
+
+You should see that you get a permission denied error.
+
+```shell
+ERROR:  permission denied for table blocks
+```
+
+Next, let's see how you can sync these credentials with a Kubernetes 
+secret.

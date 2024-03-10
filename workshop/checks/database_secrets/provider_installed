@@ -1,0 +1,5 @@
+set -e
+
+# Is the vault provider initialized?
+validate file exists /workshop/database_secrets/.terraform.lock.hcl
+validate file contains /workshop/database_secrets/.terraform.lock.hcl 'provider "registry.terraform.io/hashicorp/vault" {'

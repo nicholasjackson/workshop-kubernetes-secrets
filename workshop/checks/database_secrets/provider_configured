@@ -1,0 +1,7 @@
+set -e
+
+# Check that the provider was added
+validate file exists /workshop/database_secrets/main.tf
+validate file contains /workshop/database_secrets/main.tf 'provider "vault"'
+validate file contains /workshop/database_secrets/main.tf '"http://vault.container.local.jmpd.in:8200"'
+validate file contains /workshop/database_secrets/main.tf '"root"'

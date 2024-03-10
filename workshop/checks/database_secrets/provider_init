@@ -1,0 +1,3 @@
+set -e
+
+validate history contains --match-line "terraform init"
