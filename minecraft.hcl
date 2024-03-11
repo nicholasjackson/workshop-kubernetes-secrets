@@ -111,9 +111,4 @@ resource "container" "minecraft" {
     source      = "./minecraft/mods"
     destination = "/minecraft/mods"
   }
-
-  volume {
-    source      = "./minecraft/config/ops.json"
-    destination = "/minecraft/config/ops.json"
-  }
 }
