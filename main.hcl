@@ -1,3 +1,15 @@
+variable "docs_url" {
+  default = "http://localhost"
+}
+
+variable "minecraft_external" {
+  default = "http://localhost:25565"
+}
+
+variable "service_external" {
+  default = "http://localhost:8081"
+}
+
 variable "vault_token" {
   default = "root"
 }
@@ -20,11 +32,6 @@ variable "postgres_database" {
 
 resource "network" "local" {
   subnet = "10.100.0.0/16"
-}
-
-variable "docs_url" {
-  description = "The URL for the documentation site"
-  default     = "http://localhost"
 }
 
 local "vault_addr" {

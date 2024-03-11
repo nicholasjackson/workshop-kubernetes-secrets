@@ -1,3 +1,15 @@
+variable "minecraft_external" {
+  default = ""
+}
+
+variable "service_external" {
+  default = ""
+}
+
+variable "service_internal" {
+  default = ""
+}
+
 variable "vault_token" {
   default = ""
 }
