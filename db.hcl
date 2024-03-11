@@ -1,7 +1,7 @@
 resource "container" "postgres" {
   network {
     id         = resource.network.local.meta.id
-    ip_address = "10.5.0.60"
+    ip_address = "10.100.0.60"
   }
 
   image {

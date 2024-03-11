@@ -19,7 +19,7 @@ variable "postgres_database" {
 }
 
 resource "network" "local" {
-  subnet = "10.5.0.0/16"
+  subnet = "10.100.0.0/16"
 }
 
 variable "docs_url" {
