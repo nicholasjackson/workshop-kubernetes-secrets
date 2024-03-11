@@ -1,0 +1,5 @@
+set -e
+
+# Check that the provider was added
+validate file exists /workshop/database_secrets/k8s.tf
+validate file contains /workshop/database_secrets/k8s.tf '"kubernetes_service_account"'

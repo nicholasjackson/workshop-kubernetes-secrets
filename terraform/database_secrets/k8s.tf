@@ -15,11 +15,27 @@ resource "kubernetes_secret" "minecraft-token" {
   type = "kubernetes.io/service-account-token"
 }
 
+resource "kubernetes_cluster_role_binding" "minecraft" {
+  metadata {
+    name = "role-tokenreview-binding"
+  }
+  role_ref {
+    api_group = "rbac.authorization.k8s.io"
+    kind      = "ClusterRole"
+    name      = "system:auth-delegator"
+  }
+  subject {
+    kind      = "ServiceAccount"
+    name      = kubernetes_service_account.minecraft.metadata.0.name
+    namespace = "default"
+  }
+}
+
 resource "vault_policy" "minecraft_secrets" {
   name = "minecraft-secrets"
 
   policy = <<EOF
-  path "${vault_database_secrets_mount.minecraft.path}/creds/reader" {
+  path "${vault_database_secrets_mount.minecraft.path}/creds/${vault_database_secret_backend_role.reader.name}" {
 
     capabilities = ["read", "create", "update"]
   }
@@ -69,7 +85,7 @@ resource "kubernetes_manifest" "vault_dynamic_secret" {
     }
     "spec" = {
       "mount" = vault_database_secrets_mount.minecraft.path
-      "path"  = "creds/reader"
+      "path"  = "creds/${vault_database_secret_backend_role.reader.name}"
 
       "destination" = {
         "create" = false
@@ -165,7 +181,7 @@ resource "kubernetes_deployment" "minecraft" {
           }
           env {
             name  = "MICROSERVICES_db_host"
-            value = "postgres.container.local.jmpd.in:5432"
+            value = var.postgres_addr
           }
           env {
             name  = "MICROSERVICES_db_database"

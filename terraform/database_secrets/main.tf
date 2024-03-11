@@ -24,3 +24,7 @@ provider "vault" {
 variable "minecraft_image" {
   default = "insecure.container.local.jmpd.in:5003/minecraft:v0.2.0"
 }
+
+variable "postgres_addr" {
+  default = "10.5.0.60:5432"
+}

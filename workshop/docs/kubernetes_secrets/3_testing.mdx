@@ -1,0 +1,120 @@
+# Testing the setup
+
+Let's test all your hard work.
+
+## Checking the secret has been created
+
+First let's check that the secret has been correctly sychronised. In your terminal
+
+Run the following command.
+
+```shell
+kubectl describe vaultdynamicsecret minecraft
+```
+
+You should see something similar in the events section.
+
+```shell
+Events:
+  Type    Reason         Age   From                Message
+  ----    ------         ----  ----                -------
+  Normal  SecretSynced   106s  VaultDynamicSecret  Secret synced, lease_id="database/minecraft/creds/reader/7PXywskuYxxUJr5j2CtcCwv7", horizon=16h50m4.800071435s
+  Normal  SecretRotated  106s  VaultDynamicSecret  Secret synced, lease_id="database/minecraft/creds/reader/KLpK328nD6YoIkwn8xaw8umg", horizon=16h46m5.919663849s
+```
+
+Next let's take a look at the secret, originally the secret was provisioned with
+the following static credentials.
+
+|              |          |
+| ------------ | -------- |
+| **username** | postgres |
+| **password** | password |
+
+When you retrive the details of the secret you will see that it has been changed
+to a dynamic credential.  
+
+Let's inspect the secret, run the following command in your terminal.
+
+```shell
+kubectl get secret minecraft-db -o yaml
+```
+
+You should see something like the following
+
+```yaml
+apiVersion: v1
+data:
+  _raw: eyJwYXNzd29yZCI6InlVYTRMdW5aRUZTcGVpUkJIcVgtIiwidXNlcm5hbWUiOiJ2LWt1YmVybmV0LXJlYWRlci03Y1pJVTdOWjdQNXNYTHlNU1NndC0xNzEwMTYzMTQzIn0=
+  password: eVVhNEx1blpFRlNwZWlSQkhxWC0=
+  username: di1rdWJlcm5ldC1yZWFkZXItN2NaSVU3Tlo3UDVzWEx5TVNTZ3QtMTcxMDE2MzE0Mw==
+kind: Secret
+metadata:
+  creationTimestamp: "2024-03-11T13:19:02Z"
+  name: minecraft-db
+  namespace: default
+  resourceVersion: "1434"
+  uid: b2642d03-857e-4ed3-9c1a-749efcf03915
+type: Opaque
+```
+
+The username and password are base64 encoded, let's decode them so that we 
+can see the unencoded values.
+
+```shell
+echo "<username>" | base64 && echo ""
+echo "<password>" | base64 && echo ""
+```
+
+You should see something like the following:
+
+```shell
+echo "di1rdWJlcm5ldC1yZWFkZXItN2NaSVU3Tlo3UDVzWEx5TVNTZ3QtMTcxMDE2MzE0Mw==" | base64 -d && echo ""
+v-kubernet-reader-7cZIU7NZ7P5sXLyMSSgt-1710163143
+
+echo "eVVhNEx1blpFRlNwZWlSQkhxWC0=" | base64 -d && echo ""
+yUa4LunZEFSpeiRBHqX-
+```
+
+## Testing the application
+
+And finally, let's test the application, run the following command in your 
+terminal.
+
+```shell
+curl {{app_url}} | jq
+```
+
+You should see something like the following:
+
+```json
+[
+  {
+    "name": "Dirt",
+    "id": 1
+  },
+  {
+    "name": "Grass Block",
+    "id": 2
+  },
+  {
+    "name": "Stone",
+    "id": 3
+  },
+  {
+    "name": "Sand",
+    "id": 4
+  },
+  {
+    "name": "Gravel",
+    "id": 5
+  },
+  ```
+
+## Summary
+Congratulations this brings us to the end of the workshop, in this short workshop,
+you have learned.
+
+* How to configure dynamic database secrets for your applications.
+* How to configure Vault authentication using Kubernetes Service Accounts.
+* How to sync Dyanmic Credentials from Vault to Kubernetes Secrets.
+* The future is Minecraft microservices.
