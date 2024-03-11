@@ -41,6 +41,7 @@ resource "terraform" "k8s_app" {
   depends_on = [
     "resource.terraform.vault_controller",
     "resource.build.minecraft_prod",
+    "resource.k8s_cluster.dev",
   ]
 
   network {
