@@ -1,5 +1,5 @@
 set -e
 
 # Check that the provider was added
-validate file exists /workshop/database_secrets/main.tf
-validate file contains /workshop/database_secrets/main.tf 'resource "vault_database_secret_backend_role" "importer" '
+validate file exists /workshop/database_secrets/vault.tf
+validate file contains /workshop/database_secrets/vault.tf 'resource "vault_database_secret_backend_role" "importer" '

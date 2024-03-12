@@ -1,7 +1,81 @@
 # Introduction
 
-Locations:
+In this workshop you will learn how to use dyanmic database secrets from Vault
+and syncronise them with Kubernetes secrets using the Vault Operator.
 
-Minecraft External: {{minecraft_external}}
-Service External: {{service_external}}
-Service Internal: {{service_internal}}
+This approach means you can take advantage of unique tightly scoped credentials
+from Vault without needing to modify your Kubernetes applications.
+
+## Running the exising application
+
+If you take a look at the file `database_secrets/k8s.tf` you will see that
+it already contains a deployment, service account, and secret that provides
+static credentials for accessing the database. Let's run this application
+and then we can modify it to add the dynamic credentials.
+
+## Running the existing application
+
+In the terminal run the following commands to deploy the application to
+the kubernetes server using Terraform.
+
+```shell
+cd ./database_secrets
+terraform init
+terraform apply
+```
+
+You should see something like the following
+
+```shell
+  Enter a value: yes
+
+kubernetes_service_account.minecraft: Creating...
+kubernetes_service.minecraft: Creating...
+kubernetes_secret.minecraft-db: Creating...
+kubernetes_service.microservice: Creating...
+kubernetes_secret.minecraft-db: Creation complete after 0s [id=default/minecraft-db]
+kubernetes_service.minecraft: Creation complete after 0s [id=default/minecraft]
+kubernetes_service_account.minecraft: Creation complete after 0s [id=default/minecraft]
+kubernetes_service.microservice: Creation complete after 0s [id=default/service]
+kubernetes_deployment.minecraft: Creating...
+kubernetes_deployment.minecraft: Creation complete after 8s [id=default/minecraft]
+```
+
+Let's now test the application.
+
+## Testing the application
+
+If you run the following command to list the pods in kubernetes you should 
+see that the minecraft pod is running along with the Vault operator that 
+was deployed as part of the server install.
+
+```shell
+kubectl get pods
+```
+
+```shell
+root@vscode:/workshop/database_secrets# kubectl get pods
+NAME                                                              READY   STATUS    RESTARTS   AGE
+vault-controller-vault-secrets-operator-controller-managerwwkzb   2/2     Running   0          2m32s
+minecraft-95f5cb768-vhbh4                                         1/1     Running   0          24s
+```
+
+Our application is a Minecraft Java application so it takes a little while to start, but once it
+has you can curl the api to validate that it is working correctly.
+
+```shell
+curl {{service_internal}}
+```
+
+The service will return a list of minecraft blocks as JSON.
+
+```json
+[{"name":"Dirt","id":1},{"name":"Grass Block","id":2},{"name":"Stone","id":3},{"name":"Sand","id":4},{"name":"Gravel","id":5},{"name":"Cobblestone","id":6},{"name":"Bedrock","id":7},{"name":"Ice","id":8},{"name":"Packed Ice","id":9},{"name":"Snow Block","id":10},{"name":"Coal Ore","id":11},{"name":"Iron Ore","id":12},{"name":"Gold Ore","id":13},{"name":"Redstone Ore","id":14},{"name":"Diamond Ore","id":15},{"name":"Emerald Ore","id":16},{"name":"Lapis Lazuli Ore","id":17},{"name":"Wood Planks","id":18},{"name":"Bricks","id":19},{"name":"Stone Bricks","id":20},{"name":"Sandstone","id":21},{"name":"Nether Bricks","id":22},{"name":"Quartz Block","id":23},{"name":"Prismarine","id":24},{"name":"Purpur Block","id":25},{"name":"Concrete","id":26},{"name":"Terracotta","id":27},{"name":"Bookshelf","id":28},{"name":"Flower Pot","id":29},{"name":"Painting","id":30},{"name":"Anvil","id":31},{"name":"Enchanting Table","id":32},{"name":"Jukebox","id":33},{"name":"Note Block","id":34},{"name":"Beacon","id":35},{"name":"End Rod","id":36},{"name":"Sea Lantern","id":37},{"name":"Redstone Dust","id":38},{"name":"Redstone Torch","id":39},{"name":"Redstone Repeater","id":40},{"name":"Redstone Comparator","id":41},{"name":"Piston","id":42},{"name":"Sticky Piston","id":43},{"name":"Observer","id":44},{"name":"Dispenser","id":45},{"name":"Dropper","id":46},{"name":"Hopper","id":47},{"name":"Wheat","id":48},{"name":"Carrots","id":49},{"name":"Potatoes","id":50},{"name":"Pumpkin","id":51},{"name":"Melon","id":52},{"name":"Sugarcane","id":53},{"name":"Cactus","id":54},{"name":"Bamboo","id":55},{"name":"Nether Wart","id":56},{"name":"Chorus Plant","id":57},{"name":"Water Source Block","id":58},{"name":"Lava Source Block","id":59},{"name":"Waterlogged Blocks","id":60},{"name":"Rail","id":61},{"name":"Powered Rail","id":62},{"name":"Detector Rail","id":63},{"name":"Activator Rail","id":64},{"name":"Zombie Spawner","id":65},{"name":"Skeleton Spawner","id":66},{"name":"Spider Spawner","id":67},{"name":"Creeper Spawner","id":68},{"name":"Chest","id":69},{"name":"Furnace","id":70},{"name":"Crafting Table","id":71},{"name":"Bed","id":72},{"name":"Ender Chest","id":73},{"name":"Trapped Chest","id":74},{"name":"Anvil","id":75},{"name":"End Portal Frame","id":76},{"name":"Dragon Egg","id":77},{"name":"Beacon Block","id":78}]
+```
+
+Now let's modify the application, below are a list of handly links incase
+you need to test anything.
+
+* Minecraft External: {{minecraft_external}}
+* Service External: {{service_external}}
+* Service Internal: {{service_internal}}

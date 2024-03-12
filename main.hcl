@@ -3,7 +3,7 @@ variable "docs_url" {
 }
 
 variable "minecraft_external" {
-  default = "http://localhost:25565"
+  default = "localhost:25565"
 }
 
 variable "service_external" {

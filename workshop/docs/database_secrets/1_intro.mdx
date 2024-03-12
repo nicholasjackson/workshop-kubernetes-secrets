@@ -30,17 +30,13 @@ Let's first add a provider block to the Terraform configuration. This block
 specifies the version of the provider to use. The version is important as it
 ensures that the configuration is compatible with the provider.
 
-Add the following to your `main.tf` file in the folder `database_secrets`.
+Add the following to the `required_providers` stanza in `database/secrets/main.tf`.
 
 ```hcl
-terraform {
-  required_providers {
     vault = {
       source = "hashicorp/vault"
       version = "3.25.0"
     }
-  }
-}
 ```
 
 Once this is added, you can run `terraform init` to download the provider.

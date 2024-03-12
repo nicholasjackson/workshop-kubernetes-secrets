@@ -2,7 +2,6 @@ resource "chapter" "kubernetes_secrets" {
   title = "Managing Database Secrets with Vault"
 
   tasks = {
-    add_service_account        = resource.task.add_service_account
     add_service_account_secret = resource.task.add_service_account_secret
     add_cluster_role           = resource.task.add_cluster_role
     add_policy                 = resource.task.add_policy
@@ -25,24 +24,6 @@ resource "chapter" "kubernetes_secrets" {
     content = template_file("docs/kubernetes_secrets/3_testing.mdx", {
       app_url = "${docker_ip()}:8081"
     })
-  }
-}
-
-resource "task" "add_service_account" {
-  prerequisites = []
-
-  config {
-    user   = "root"
-    target = variable.terraform_target
-  }
-
-  condition "sa_added" {
-    description = "The service account for authentication has been added to the config"
-
-    check {
-      script          = file("checks/kubernetes_secrets/sa_added")
-      failure_message = "The 'kubernetes_service_account' resource was not added to the config"
-    }
   }
 }
 
