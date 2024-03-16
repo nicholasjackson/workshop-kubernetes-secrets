@@ -2,6 +2,10 @@ variable "docs_url" {
   default = "http://localhost"
 }
 
+variable "disable_local_minecraft" {
+  default = true
+}
+
 variable "minecraft_external" {
   default = "localhost:25565"
 }

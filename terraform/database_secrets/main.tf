@@ -13,7 +13,7 @@ provider "kubernetes" {
 }
 
 variable "minecraft_image" {
-  default = "insecure.container.local.jmpd.in:5003/minecraft:v0.2.0"
+  default = "docker.io/nicholasjackson/minecraft-prod:0.1.1"
 }
 
 variable "postgres_addr" {

@@ -1,57 +1,30 @@
 # Build the development image
 resource "build" "minecraft_dev" {
+  disabled = variable.disable_local_minecraft
+
   container {
     dockerfile = "Dockerfile"
     context    = "./minecraft/DockerDev"
   }
 }
 
-# Copy the build context to a temporary directory
-resource "copy" "minecraft_build" {
-  source      = "./minecraft/DockerProd"
-  destination = "${data("build")}"
-}
-
-# Copy the world and mods to the build context
-resource "copy" "minecraft_world" {
-  source      = "./minecraft/world"
-  destination = "${resource.copy.minecraft_build.destination}/world"
-}
-
-
-resource "copy" "minecraft_mods" {
-  source      = "./minecraft/mods"
-  destination = "${resource.copy.minecraft_build.destination}/mods"
-}
-
-resource "copy" "minecraft_config" {
-  source      = "./minecraft/config"
-  destination = "${resource.copy.minecraft_build.destination}/config"
-}
-
-# Build the production image and push to the insecure registry
-resource "build" "minecraft_prod" {
-  container {
-    dockerfile = "Dockerfile"
-    context    = data("build")
-  }
-
-  registry {
-    name = "${resource.container.insecure.container_name}:5003/minecraft:v0.2.0"
-  }
-}
-
 resource "template" "db_username" {
+  disabled = variable.disable_local_minecraft
+
   source      = variable.postgres_user
   destination = "${data("secrets")}/username"
 }
 
 resource "template" "db_password" {
+  disabled = variable.disable_local_minecraft
+
   source      = variable.postgres_password
   destination = "${data("secrets")}/password"
 }
 
 resource "container" "minecraft" {
+  disabled = variable.disable_local_minecraft
+
   image {
     name = resource.build.minecraft_dev.image
   }

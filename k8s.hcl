@@ -37,6 +37,35 @@ resource "terraform" "vault_controller" {
   }
 }
 
+resource "terraform" "service" {
+  depends_on = [
+    "resource.k8s_cluster.dev",
+    "resource.terraform.vault_controller"
+  ]
+
+  network {
+    id = resource.network.local.meta.id
+  }
+
+  environment = {
+    KUBE_CONFIG_PATH = "/root/.kube/config"
+  }
+
+  source            = "./terraform/database_secrets"
+  working_directory = "/"
+  version           = "1.6.2"
+
+  variables = {
+    postgres_addr   = "${resource.container.postgres.network.0.assigned_address}:5432"
+    minecraft_image = "docker.io/nicholasjackson/minecraft-prod:0.1.1"
+  }
+
+  volume {
+    source      = resource.k8s_cluster.dev.kube_config.path
+    destination = "/root/.kube/config"
+  }
+}
+
 resource "ingress" "microservice_http" {
   port = 8081
 

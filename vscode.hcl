@@ -72,6 +72,11 @@ resource "container" "vscode" {
     destination = "/workshop/database_secrets"
   }
 
+  volume {
+    source      = "${jumppad()}/terraform/state/${resource.terraform.service.meta.id}/terraform.tfstate"
+    destination = "/workshop/database_secrets/terraform.tfstate"
+  }
+
   environment = {
     KUBE_CONFIG_PATH = "/root/.kube/config"
     KUBECONFIG       = "/root/.kube/config"

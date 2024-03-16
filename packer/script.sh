@@ -18,14 +18,14 @@ echo "deb [trusted=yes] https://apt.fury.io/jumppad/ /" | \
   sudo tee -a /etc/apt/sources.list.d/fury.list
 sudo apt-get update; sudo apt-get install -y jumppad
 
-# Run the Workshop
-git clone https://github.com/jumppad-labs/terraform-workshop.git
+mkdir /root/workshop
+
+pushd /root
+
+# Run the Workshop to cache output
+git clone https://github.com/nicholasjackson/workshop-kubernetes-secrets.git ./workshop
 
 # Run jumppad to cache the images
-pushd terraform-workshop
+pushd /root/workshop
 sudo jumppad up
 sudo jumppad down
-
-# move the workshop files
-popd
-sudo mv terraform-workshop /root/terraform-workshop
