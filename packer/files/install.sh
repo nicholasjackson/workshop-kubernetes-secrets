@@ -41,4 +41,16 @@ systemctl enable jumppad-connector.service
 # Pre-pull docker images
 for IMAGE in $JUMPPAD_IMAGES; do
   docker pull $IMAGE
-done  
+done
+
+# Create the workshop directory
+mkdir /root/workshop
+
+# Clone the workshop
+pushd /root
+git clone https://github.com/nicholasjackson/workshop-kubernetes-secrets.git ./workshop
+
+# Run jumppad to cache the images
+pushd /root/workshop
+sudo jumppad up --non-interactive
+sudo jumppad down --force
